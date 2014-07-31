@@ -1,0 +1,57 @@
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse'
+
+
+sourceCompatibility = 1.7
+
+configurations {
+    extraStuff
+    compileWithExtraStuff { extendsFrom compile, extraStuff }
+}
+
+repositories {
+    mavenCentral()
+    flatDir { dirs "lib" }
+}
+
+dependencies {
+	testCompile group: 'junit', name: 'junit', version: '4.+'
+
+	providedCompile 'org.apache.tomcat:tomcat-servlet-api:7.0.37'
+    
+    runtime ('com.wordnik:swagger-annotations:1.3.2') { transitive = false }
+    runtime ('com.wordnik:swagger-core_2.10:1.3.2') { transitive = false }
+    runtime ('com.wordnik:swagger-jaxrs_2.10:1.3.2') { transitive = false }
+    runtime ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.2') { transitive = false }  
+    
+    extraStuff ('com.wordnik:swagger-annotations:1.3.2') 
+    extraStuff  ('com.wordnik:swagger-core_2.10:1.3.2') 
+    extraStuff  ('com.wordnik:swagger-jaxrs_2.10:1.3.2') 
+    extraStuff  ('com.wordnik:swagger-jersey-jaxrs_2.10:1.3.2') 
+    
+    providedCompile 'com.google.code.gson:gson:2.2.4'
+    providedCompile 'javax.persistence:persistence-api:1.0'
+    providedCompile 'com.sun.jersey:jersey-json:1.13'
+    providedCompile 'mysql:mysql-connector-java:5.1.26'
+    providedCompile "javax.ws.rs:jsr311-api:1.1.1"
+    providedCompile 'com.sun.jersey:jersey-server:1.13'
+    providedCompile 'com.sun.jersey:jersey-core:1.13'
+    providedCompile 'com.sun.jersey:jersey-servlet:1.13'
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
+
+sourceSets.main {
+    compileClasspath = configurations.compileWithExtraStuff
+}
