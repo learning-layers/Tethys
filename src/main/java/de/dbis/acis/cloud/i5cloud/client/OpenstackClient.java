@@ -43,7 +43,8 @@ public class OpenstackClient {
 	// TODO hardcodet!?
 	private static ClientConfig cfg = null;
 	private static String protocol = "http://";
-	private static String openstackIP ="137.226.58.2";
+	//private static String openstackIP ="137.226.58.2";
+	private static String openstackIP ="10.255.255.3";
 	private static String portKeystoneAdmin = ":35357";
 	private static String portKeystoneMember = ":5000";
 	private static String portNovaMember = ":8774";
@@ -109,6 +110,37 @@ public class OpenstackClient {
 		
 		JsonObject output = null;
 		JsonObject response = authOpenstack(smessage,false);
+		
+		if(response!=null) {
+
+			output = new JsonObject();
+		
+			output.add("X-Auth-Token", response.getAsJsonObject("access").getAsJsonObject("token").get("id"));
+			output.add("expires", response.getAsJsonObject("access").getAsJsonObject("token").get("expires"));
+			//output.add("tenant-id", response.getAsJsonObject("access").getAsJsonObject("token").getAsJsonObject("tenant").get("id"));
+			output.addProperty("swift-url", protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+
+					response.getAsJsonObject("access").getAsJsonObject("token").getAsJsonObject("tenant").get("id").getAsString());
+		}
+		
+		return output;		  
+	}
+	
+	/**
+	 * Manipulates the Auth-Response of Openstack.
+	 * <p>
+	 * input: {"service":""}, {"username":""}, {"password":""}
+	 * <p>
+	 * output {"X-Auth-Token":"","expires":"","service-id":"","swift-url":""}
+	 * 
+	 * @param tenantName
+	 * @param username
+	 * @param password
+	 * @return JsonObject
+	 */
+	public static JsonObject adminAuth(SMessageAuth smessage) {
+		
+		JsonObject output = null;
+		JsonObject response = authOpenstack(smessage,true);
 		
 		if(response!=null) {
 
@@ -331,7 +363,10 @@ public class OpenstackClient {
 		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 		ClientResponse response = tokens.header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
+		
 		InputStream bis = response.getEntityInputStream();
+		
+		
 		int i;
 		
 		while ((i = bis.read()) != -1) {
@@ -344,6 +379,40 @@ public class OpenstackClient {
 
 		//return Response.ok().type(response.getType());
 		
+	}
+	
+	/**
+	 * Gets a file from a given container of a service/tenant in Swift.
+	 * 
+	 * @param xAuthToken
+	 * @param tenantid
+	 * @param path
+	 * @return the file
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public static StreamingOutput getFile2(String xAuthToken, String tenantid, String path ) throws IOException, ClassNotFoundException {
+		Client client = Client.create(returnClientConfig());
+		StreamingOutput clientOS = null;
+//		client.setChunkedEncodingSize(16384);
+		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+		ClientResponse response = tokens.header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+
+		
+		final InputStream bis = response.getEntityInputStream();
+		clientOS = new StreamingOutput() {
+			@Override
+			public void write(OutputStream clientOS) throws IOException, WebApplicationException{
+				int i;			
+				while ((i = bis.read()) != -1) {
+					clientOS.write(i);
+				}	
+				bis.close();
+				clientOS.flush();
+				clientOS.close();
+			}
+		};
+		return clientOS;
 	}
 	
 //	REQ: curl -i http://137.226.58.142:35357/v2.0/users -X POST -H "User-Agent: python-keystoneclient" -H "Content-Type: application/json" -H "X-Auth-Token: f1895418260b4c549969d8f4c58e14e9"
