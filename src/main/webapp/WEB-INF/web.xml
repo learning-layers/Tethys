@@ -6,13 +6,13 @@
 	id="WebApp_ID" 
 	version="2.5">
 	
-	<display-name>de.dbis.acis.cloud.i5cloud</display-name>
+	<display-name>de.dbis.acis.cloud.Tethys</display-name>
 	<servlet>
-		<servlet-name>i5Cloud</servlet-name>
+		<servlet-name>Tethys</servlet-name>
     	<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
       		<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>de.dbis.acis.cloud.i5cloud;com.wordnik.swagger.sample.util;com.wordnik.swagger.jersey.listing</param-value>
+			<param-value>de.dbis.acis.cloud.Tethys;com.wordnik.swagger.sample.util;com.wordnik.swagger.jersey.listing</param-value>
 		</init-param>
         <init-param>
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
@@ -21,7 +21,7 @@
         <load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>i5Cloud</servlet-name>
+		<servlet-name>Tethys</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 	
@@ -35,18 +35,18 @@
   </init-param>
   <init-param>
     <param-name>swagger.api.basepath</param-name>
-    <param-value>http://137.226.58.11:8081/i5Cloud</param-value>
+    <param-value>http://137.226.58.11:8081/Tethys</param-value>
   </init-param>
   <init-param>
       <param-name>swagger.filter</param-name>
-      <param-value>de.dbis.acis.cloud.i5cloud.util.InternalSwaggerFilter</param-value>
+      <param-value>de.dbis.acis.cloud.Tethys.util.InternalSwaggerFilter</param-value>
     </init-param>
   <load-on-startup>1</load-on-startup>
 </servlet>
 
 <filter>
   <filter-name>CorsFilter</filter-name>
-  <filter-class>de.dbis.acis.cloud.i5cloud.util.CORSFilter</filter-class>
+  <filter-class>de.dbis.acis.cloud.Tethys.util.CORSFilter</filter-class>
 </filter>
 <filter-mapping>
   <filter-name>CorsFilter</filter-name>

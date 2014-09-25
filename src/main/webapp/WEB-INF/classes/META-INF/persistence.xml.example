@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
     version="2.0">
-    <persistence-unit name="i5Cloud"  transaction-type="RESOURCE_LOCAL"> 
+    <persistence-unit name="Tethys"  transaction-type="RESOURCE_LOCAL"> 
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <class>de.dbis.acis.cloud.i5cloud.entity.Services</class>
         <class>de.dbis.acis.cloud.i5cloud.entity.ServiceFlavors</class>
