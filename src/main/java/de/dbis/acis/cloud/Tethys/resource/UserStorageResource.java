@@ -2,20 +2,15 @@ package de.dbis.acis.cloud.Tethys.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -26,7 +21,6 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 import de.dbis.acis.cloud.Tethys.client.OpenstackClient;
-import de.dbis.acis.cloud.Tethys.entity.Services;
 import de.dbis.acis.cloud.Tethys.message.server.SMessageAuth;
 
 
@@ -62,18 +56,13 @@ public class UserStorageResource {
 	public Response getFiles(@PathParam("path") String path) throws ClassNotFoundException, IOException{
 		
 		Response r = null;
-		StreamingOutput clientOS = null;
 		
 //		CHECK IF ISS/SUB is right ELSE NO ACCESS
-		SMessageAuth smessage = new SMessageAuth();
-		smessage.setPassword("swift");
-		smessage.setService("service");
-		smessage.setUsername("swift");
-		JsonObject key = OpenstackClient.adminAuth(smessage);	
+		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());		
 		
+//		LOGG
 		System.out.println("ISS+SUB:" + iss+"."+sub);
-		System.out.println("Token:  " + key.get("X-Auth-Token").getAsString());
-		System.out.println("SID:    " + key.get("tenant-id").getAsString());
+		this.logKeystoneAuthResponse(key);
 		
 		if(key != null) {
 				try {
@@ -99,11 +88,11 @@ public class UserStorageResource {
 		Response.ResponseBuilder r = null;
 		
 //		CHECK IF ISS/SUB is right ELSE NO ACCESS
-		SMessageAuth smessage = new SMessageAuth();
-		smessage.setPassword("swift");
-		smessage.setService("service");
-		smessage.setUsername("swift");
-		JsonObject key = OpenstackClient.adminAuth(smessage);	
+		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());	
+		
+//		LOGG
+		System.out.println("ISS+SUB:" + iss+"."+sub);
+		this.logKeystoneAuthResponse(key);
 
 		if(key != null) {
 			r =  OpenstackClient.uploadFile(is, key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), iss+"."+sub+"/"+path);
@@ -125,15 +114,12 @@ public class UserStorageResource {
 		JsonArray output = null;
 		
 //		CHECK IF ISS/SUB is right ELSE NO ACCESS
-		SMessageAuth smessage = new SMessageAuth();
-		smessage.setPassword("swift");
-		smessage.setService("service");
-		smessage.setUsername("swift");
-		JsonObject key = OpenstackClient.adminAuth(smessage);	
+
+		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());	
 		
+//		LOGG
 		System.out.println("ISS+SUB:" + iss+"."+sub);
-		System.out.println("Token:  " + key.get("X-Auth-Token").getAsString());
-		System.out.println("SID:    " + key.get("tenant-id").getAsString());
+		this.logKeystoneAuthResponse(key);
 		
 		if(key != null) {
 			output =  OpenstackClient.getUploadedFiles(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), iss+"."+sub);
@@ -141,5 +127,18 @@ public class UserStorageResource {
 		
 		r = Response.ok(output).status(Status.OK);
 		return r.build();
+	}
+	
+	private SMessageAuth getSwiftCredentials(){
+		SMessageAuth smessage = new SMessageAuth();
+		smessage.setPassword("swift");
+		smessage.setService("service");
+		smessage.setUsername("swift");
+		return smessage;
+	}
+	
+	private void logKeystoneAuthResponse(JsonObject key){
+		System.out.println("Token:  " + key.get("X-Auth-Token").getAsString());
+		System.out.println("SID:    " + key.get("tenant-id").getAsString());
 	}
 }
