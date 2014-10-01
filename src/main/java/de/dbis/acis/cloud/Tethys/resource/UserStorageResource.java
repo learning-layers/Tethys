@@ -25,17 +25,19 @@ import de.dbis.acis.cloud.Tethys.message.server.SMessageAuth;
 
 
 /**
- * This SubResource matches the URL /Tethys/users/{iss}/{sub}
+ * This Resource matches the URL /Tethys/users/{sub}
  * 
  * @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de> *
  */
-@Path("/users/{iss}/{sub}")
-@Api(value="/users/{iss}/{sub}", description = "Operations about Files & Container")
+@Path("/users/{sub}")
+@Api(value="/users/{sub}", description = "Operations about Files & Container")
 public class UserStorageResource {
 
-	@PathParam("iss") String iss;
 	@PathParam("sub") String sub;
 	
+	/**
+	 * @return
+	 */
 	@POST	
 	@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
 	@ApiOperation(value="Returns the details of a service.")
@@ -47,6 +49,12 @@ public class UserStorageResource {
 		return null;
 	}
 	
+	/**
+	 * @param path
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
 	@GET
 	@Path("/storage/{path:.+}")
 	@ApiOperation(value="Get a list of all files in a sub-storage or a file with specified path")
@@ -61,12 +69,12 @@ public class UserStorageResource {
 		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());		
 		
 //		LOGG
-		System.out.println("ISS+SUB:" + iss+"."+sub);
+		System.out.println("SUB:"+sub);
 		this.logKeystoneAuthResponse(key);
 		
 		if(key != null) {
 				try {
-					r = OpenstackClient.getFile2(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), iss+"."+sub+"/"+path);
+					r = OpenstackClient.getFile2(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub+"/"+path);
 				} catch (ClassNotFoundException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -76,6 +84,12 @@ public class UserStorageResource {
 		return r;
 	}
 	
+	/**
+	 * @param path
+	 * @param is
+	 * @return
+	 * @throws IOException
+	 */
 	@PUT
 	@Path("/storage/{path : .+}")
 	@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
@@ -91,17 +105,20 @@ public class UserStorageResource {
 		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());	
 		
 //		LOGG
-		System.out.println("ISS+SUB:" + iss+"."+sub);
+		System.out.println("SUB:"+sub);
 		this.logKeystoneAuthResponse(key);
 
 		if(key != null) {
-			r =  OpenstackClient.uploadFile(is, key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), iss+"."+sub+"/"+path);
+			r =  OpenstackClient.uploadFile(is, key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub+"/"+path);
 		}
 		
 		return r.build();
 		
 	}
 	
+	/**
+	 * @return
+	 */
 	@GET
 	@Path("/storage/")
 	@ApiOperation(value="blah")
@@ -118,17 +135,20 @@ public class UserStorageResource {
 		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());	
 		
 //		LOGG
-		System.out.println("ISS+SUB:" + iss+"."+sub);
+		System.out.println("SUB:" + sub);
 		this.logKeystoneAuthResponse(key);
 		
 		if(key != null) {
-			output =  OpenstackClient.getUploadedFiles(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), iss+"."+sub);
+			output =  OpenstackClient.getUploadedFiles(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub);
 		}
 		
 		r = Response.ok(output).status(Status.OK);
 		return r.build();
 	}
 	
+	/**
+	 * @return
+	 */
 	private SMessageAuth getSwiftCredentials(){
 		SMessageAuth smessage = new SMessageAuth();
 		smessage.setPassword("swift");
@@ -137,6 +157,9 @@ public class UserStorageResource {
 		return smessage;
 	}
 	
+	/**
+	 * @param key
+	 */
 	private void logKeystoneAuthResponse(JsonObject key){
 		System.out.println("Token:  " + key.get("X-Auth-Token").getAsString());
 		System.out.println("SID:    " + key.get("tenant-id").getAsString());
