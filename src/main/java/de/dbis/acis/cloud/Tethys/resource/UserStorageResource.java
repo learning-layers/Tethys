@@ -29,26 +29,13 @@ import de.dbis.acis.cloud.Tethys.message.server.SMessageAuth;
  * 
  * @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de> *
  */
-@Path("/users/{sub}")
+@Path("/users/{sub}/storage")
 @Api(value="/users/{sub}", description = "Operations about Files & Container")
 public class UserStorageResource {
 
 	@PathParam("sub") String sub;
 	
-	/**
-	 * @return
-	 */
-	@POST	
-	@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
-	@ApiOperation(value="Returns the details of a service.")
-	@ApiResponses( {
-		@ApiResponse(code = 200, message = "OK")
-	} )
-	public Response createStorage(){
-		
-		return null;
-	}
-	
+
 	/**
 	 * @param path
 	 * @return
@@ -56,7 +43,7 @@ public class UserStorageResource {
 	 * @throws IOException
 	 */
 	@GET
-	@Path("/storage/{path:.+}")
+	@Path("{path:.+}")
 	@ApiOperation(value="Get a list of all files in a sub-storage or a file with specified path")
 	@ApiResponses( {
 		@ApiResponse(code = 200, message = "OK")
@@ -91,7 +78,7 @@ public class UserStorageResource {
 	 * @throws IOException
 	 */
 	@PUT
-	@Path("/storage/{path : .+}")
+	@Path("{path : .+}")
 	@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
 	@ApiOperation(value="puts file/substorage with specified pat")
 	@ApiResponses( {
@@ -120,7 +107,6 @@ public class UserStorageResource {
 	 * @return
 	 */
 	@GET
-	@Path("/storage/")
 	@ApiOperation(value="blah")
 	@ApiResponses( {
 		@ApiResponse(code = 200, message = "OK")

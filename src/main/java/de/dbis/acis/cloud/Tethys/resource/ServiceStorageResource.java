@@ -30,14 +30,14 @@ import de.dbis.acis.cloud.Tethys.jpa.impl.ServicesJpaImpl;
  */
 @Path("/services/{service-id}/storage")
 @Api(value="/services/{service-id}/storage", description = "Operations about Files & Container")
-public class StorageResource {
+public class ServiceStorageResource {
 
 	private ServicesJpa servicesService;
 	
 	/**
 	 * Class Constructor
 	 */
-	public StorageResource() {
+	public ServiceStorageResource() {
 		servicesService = new ServicesJpaImpl();
 	}
 	
