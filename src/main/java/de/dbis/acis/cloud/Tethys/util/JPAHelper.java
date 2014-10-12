@@ -23,7 +23,7 @@ public class JPAHelper {
      */
     static {
         try {
-            entityManagerFactory = Persistence.createEntityManagerFactory("i5Cloud");
+            entityManagerFactory = Persistence.createEntityManagerFactory("Tethys");
         } catch (Throwable ex) {
             //logger.error("Initial SessionFactory creation failed", ex);
             throw new ExceptionInInitializerError(ex);

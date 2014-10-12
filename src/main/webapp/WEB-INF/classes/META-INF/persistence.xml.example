@@ -6,8 +6,8 @@
     version="2.0">
     <persistence-unit name="Tethys"  transaction-type="RESOURCE_LOCAL"> 
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>de.dbis.acis.cloud.i5cloud.entity.Services</class>
-        <class>de.dbis.acis.cloud.i5cloud.entity.ServiceFlavors</class>
+        <class>de.dbis.acis.cloud.Tethys.entity.Services</class>
+        <class>de.dbis.acis.cloud.Tethys.entity.ServiceFlavors</class>
         <properties>
             <property name="hibernate.show_sql" value="true" />
             <property name="javax.persistence.transactionType" value="RESOURCE_LOCAL" />
