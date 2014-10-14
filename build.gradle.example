@@ -85,8 +85,8 @@ cargo {
         context = 'Tethys'
     }
     remote {
-        hostname = '137.226.58.11'
-        username = 'remote'
-        password = 'remote'
+        hostname = 'hostname'
+        username = 'superuser'
+        password = 'supersecret'
     }
 }
