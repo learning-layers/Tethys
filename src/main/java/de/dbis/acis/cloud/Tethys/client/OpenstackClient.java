@@ -320,6 +320,16 @@ public class OpenstackClient {
 		
 	}
 	
+	public static Status createContainer(String xAuthToken, String tenantid, String containerName){
+		Client client = Client.create(returnClientConfig());
+		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+containerName);
+		
+		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(ClientResponse.class);
+
+		
+		return response.getClientResponseStatus();
+	}
+	
 //	/**
 //	 * Gets a file from a given container of a service/tenant in Swift.
 //	 * 

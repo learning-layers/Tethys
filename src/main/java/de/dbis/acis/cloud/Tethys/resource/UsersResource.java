@@ -9,6 +9,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -98,14 +99,16 @@ public class UsersResource {
 	 */
 	@POST
 	@Path("/users/{sub}")
-	@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
-	@ApiOperation(value="Returns the details of a service.")
+	//@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
+	@ApiOperation(value="Creates User with LDAP User Data")
 	@ApiResponses( {
 		@ApiResponse(code = 200, message = "OK")
 	} )
-	public Response createStorage(){
-		
-		return null;
+	public Response createStorage(@PathParam("sub") String sub){
+		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());
+		com.sun.jersey.api.client.ClientResponse.Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub);
+		return Response.status(answer).build();
 	}
+	
 	
 }

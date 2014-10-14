@@ -135,7 +135,7 @@ public class UserStorageResource {
 	/**
 	 * @return
 	 */
-	private SMessageAuth getSwiftCredentials(){
+	protected static SMessageAuth getSwiftCredentials(){
 		SMessageAuth smessage = new SMessageAuth();
 		smessage.setPassword("swift");
 		smessage.setService("service");
