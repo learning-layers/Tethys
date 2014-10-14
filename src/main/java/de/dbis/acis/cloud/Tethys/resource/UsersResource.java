@@ -104,10 +104,16 @@ public class UsersResource {
 	@ApiResponses( {
 		@ApiResponse(code = 200, message = "OK")
 	} )
-	public Response createStorage(@PathParam("sub") String sub){
+	public Response createStorage(@PathParam("sub") String sub, @HeaderParam("pw") String pw){
+		Response r = null;
+		
+		if(pw.equals("useanotherpw")){
+		
 		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());
-		com.sun.jersey.api.client.ClientResponse.Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub);
-		return Response.status(answer).build();
+		com.sun.jersey.api.client.ClientResponse.Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), "user_"+sub);
+			r = Response.status(answer).build();
+		}
+		return r;
 	}
 	
 	

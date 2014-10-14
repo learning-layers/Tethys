@@ -61,7 +61,7 @@ public class UserStorageResource {
 		
 		if(key != null) {
 				try {
-					r = OpenstackClient.getFile2(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub+"/"+path);
+					r = OpenstackClient.getFile2(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), "user_"+sub+"/"+path);
 				} catch (ClassNotFoundException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -96,7 +96,7 @@ public class UserStorageResource {
 		this.logKeystoneAuthResponse(key);
 
 		if(key != null) {
-			r =  OpenstackClient.uploadFile(is, key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub+"/"+path);
+			r =  OpenstackClient.uploadFile(is, key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), "user_"+sub+"/"+path);
 		}
 		
 		return r.build();
@@ -125,7 +125,7 @@ public class UserStorageResource {
 		this.logKeystoneAuthResponse(key);
 		
 		if(key != null) {
-			output =  OpenstackClient.getUploadedFiles(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), sub);
+			output =  OpenstackClient.getUploadedFiles(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), "user_"+sub);
 		}
 		
 		r = Response.ok(output).status(Status.OK);
