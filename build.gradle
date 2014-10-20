@@ -1,3 +1,9 @@
+//
+// @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de>
+//
+// use gradle.properties to define parameters
+//
+//
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'eclipse'
@@ -78,15 +84,23 @@ eclipse {
   }
 }
 
+
 cargo {
-    containerId = 'tomcat7x'
-    port = 8081
+    containerId = cargo_containerId
+    port = Integer.parseInt(cargo_port)
     deployable {
-        context = 'Tethys'
+        context = cargo_deployName
     }
     remote {
-        hostname = 'hostname'
-        username = 'superuser'
-        password = 'supersecret'
+        hostname =  cargo_hostname
+        username =  cargo_username
+        password  =  cargo_password
     }
+}
+
+task print {
+println "Properties:"
+println "Deploy Name: " + cargo_deployName
+println "Remote: " + cargo_containerId + "@" + cargo_hostname + ":" + cargo_port + "?" + cargo_username + ":" + cargo_password 
+
 }
