@@ -19,30 +19,26 @@ A cloud platform for managing services and its virtual machines, storage contain
 
 ### How to work with your feature branches
 
-    ./otherResources/mysql/create_db.sql
+1 Assign JIRA ticket to yourself, create one if necessary
 
-1. **Assign JIRA ticket to yourself, create one if necessary**
-
-2. **Create local feature branch from develop branch**
-
+2 Create local feature branch from develop branch
 
     git checkout develop
     git pull
     git checkout -b <your-developer-id>-<issue-name>
     
-3a. **Work on your local branch and commit them**
+3a Work on your local branch and commit them
 
-3b. **Rebase frequently and resolve conflicts**
+3b Rebase frequently and resolve conflicts
 
     git fetch origin
     git rebase origin/develop
     
-4. **Repeat 3a and 3b until feature is complete and passed all tests. Share/Push your branch**
-
+4 Repeat 3a and 3b until feature is complete and passed all tests. Share/Push your branch
 
     git push origin <your-developer-id>-<issue-name>
     
-5. **Let someone else review and merge your feature branch with the develope branch. Keep track of your actions in JIRA**
+5 Let someone else review and merge your feature branch with the develope branch. Keep track of your actions in JIRA
     
 ### Initial setup
 Before you can deploy our application you need to create a few files to fill in necessary information.
