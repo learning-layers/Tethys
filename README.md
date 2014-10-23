@@ -19,26 +19,77 @@ A cloud platform for managing services and its virtual machines, storage contain
 
 ### How to work with your feature branches
 
-1 Assign JIRA ticket to yourself, create one if necessary
+***Assign JIRA ticket to yourself, create one if necessary.***
 
-2 Create local feature branch from develop branch
+***Create local feature branch from develop branch.***
 
+    git fetch
     git checkout develop
     git pull
     git checkout -b <your-developer-id>-<issue-name>
     
-3a Work on your local branch and commit them
+***Work on your local branch and commit them.***
 
-3b Rebase frequently and resolve conflicts
+***Rebase frequently and resolve conflicts.***
 
     git fetch origin
-    git rebase origin/develop
+    git rebase -i origin/develop
     
-4 Repeat 3a and 3b until feature is complete and passed all tests. Share/Push your branch
+***Repeat both previous steps until feature is complete and passed all tests. Share/Push your branch.***
 
     git push origin <your-developer-id>-<issue-name>
     
-5 Let someone else review and merge your feature branch with the develope branch. Keep track of your actions in JIRA
+***Let someone else review your changes and merge your feature branch with the develope branch. Keep track of your actions in JIRA***
+    
+### How to review feature branch
+
+***Get the Code***
+
+    git fetch
+    git checkout <your-developer-id>-<issue-name>
+    git pull
+    
+***Review Code and test it***
+
+***If feature is finished merge it with develope***
+
+    git fetch
+    git checkout develop
+    git merge --no-ff origin/<your-developer-id>-<issue-name>
+    git push
+    
+***Close JIRA issue***
+
+### How to release
+
+***Create new release branch from develope branch***
+
+    git fetch
+    git checkout develop
+    git pull
+    git checkout -b release-<release-id>
+    
+***Bump version***
+
+***Commit new release***
+
+    git commit -a -m "Release version <release-id>"
+    
+***Put Release into master***
+
+    git fetch
+    git checkout master
+    git merge --no-ff release-<release-id>
+    git tag -a <release-id>
+    git push
+    
+***Put new version into develop***
+
+    git fetch
+    git checkout develop
+    git merge --no-ff release-<release-id>
+    git branch -d release-<release-id>
+    git push
     
 ## Initial setup
 Before you can deploy our application you need to create a few files to fill in necessary information.
