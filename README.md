@@ -3,7 +3,7 @@
 A cloud platform for managing services and its virtual machines, storage containers as well as users with their storage containers. Works together with OpenStack. Formerly known as "i5Cloud".
 
 
-## Getting started
+# Getting started
 
 ## Contribution guidelines
 
@@ -40,7 +40,7 @@ A cloud platform for managing services and its virtual machines, storage contain
     
 5 Let someone else review and merge your feature branch with the develope branch. Keep track of your actions in JIRA
     
-### Initial setup
+## Initial setup
 Before you can deploy our application you need to create a few files to fill in necessary information.
 To make it easier for you we created several example files, which you can use as a template.
 Here is a list of those files:
@@ -53,4 +53,9 @@ As you already saw in persistence.xml we are using MySQL. You need to setup a My
 
     ./otherResources/mysql/create_db.sql
 
-Developed by Gordon Lawrenz
+```
+Developed by
+    Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de>
+```
+
+[thoughtbot]: https://github.com/thoughtbot/guides/tree/master/protocol/git
