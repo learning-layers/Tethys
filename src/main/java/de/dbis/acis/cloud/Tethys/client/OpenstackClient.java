@@ -43,8 +43,9 @@ public class OpenstackClient {
 	// TODO hardcodet!?
 	private static ClientConfig cfg = null;
 	private static String protocol = "http://";
-	//private static String openstackIP ="137.226.58.2";
-	private static String openstackIP ="10.255.255.3";
+	private static String externalOpenstackIP ="137.226.58.2";
+	private static String internalOpenstackIP ="10.255.255.3";
+	private static String openstackIPForPublishing = externalOpenstackIP;
 	private static String portKeystoneAdmin = ":35357";
 	private static String portKeystoneMember = ":5000";
 	private static String portNovaMember = ":8774";
@@ -81,7 +82,7 @@ public class OpenstackClient {
 	public static JsonObject authOpenstack(SMessageAuth smessage, boolean admin) {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+ (admin?portKeystoneAdmin:portKeystoneMember) +"/v2.0/tokens");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+ (admin?portKeystoneAdmin:portKeystoneMember) +"/v2.0/tokens");
 		MessageAuth message = new MessageAuth(smessage);
 		
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,message);
@@ -118,7 +119,7 @@ public class OpenstackClient {
 			output.add("X-Auth-Token", response.getAsJsonObject("access").getAsJsonObject("token").get("id"));
 			output.add("expires", response.getAsJsonObject("access").getAsJsonObject("token").get("expires"));
 			//output.add("tenant-id", response.getAsJsonObject("access").getAsJsonObject("token").getAsJsonObject("tenant").get("id"));
-			output.addProperty("swift-url", protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+
+			output.addProperty("swift-url", protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+
 					response.getAsJsonObject("access").getAsJsonObject("token").getAsJsonObject("tenant").get("id").getAsString());
 		}
 		
@@ -166,7 +167,7 @@ public class OpenstackClient {
 	public static JsonObject serviceLimits(String xAuthToken, String tenantId) {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portNovaMember+"/v2/"+tenantId+"/limits");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/limits");
 		
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 		JsonObject output = null;
@@ -195,7 +196,7 @@ public class OpenstackClient {
 	public static JsonObject createInstance(String xAuthToken, String tenantId, JsonElement name, JsonElement script, JsonElement imageRef ,JsonElement flavorRef) {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portNovaMember+"/v2/"+tenantId+"/servers");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers");
 		
 		JsonObject request = new JsonObject();	
 		JsonObject serverdata = new JsonObject();
@@ -232,7 +233,7 @@ public class OpenstackClient {
 		
 		URLConnection urlconnection=null;
 
-		urlconnection =  (HttpURLConnection) new URL(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path).openConnection();
+		urlconnection =  (HttpURLConnection) new URL(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path).openConnection();
 
 		urlconnection.setDoOutput(true);
 		urlconnection.setDoInput(true);
@@ -288,7 +289,7 @@ public class OpenstackClient {
 		
 		if(responseCode == 201) {
 			responseObject = new JsonObject();
-			responseObject.addProperty("swift-url", protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+			responseObject.addProperty("swift-url", protocol+openstackIPForPublishing+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 		}
 		
 		return Response.ok(responseObject).status(responseCode);//new ResponseImpl(responseCode, null, responseMessage, String.class); //(responseCode, null, null, null);
@@ -306,7 +307,7 @@ public class OpenstackClient {
 	public static JsonArray getUploadedFiles(String xAuthToken, String tenantid, String path ) {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 		
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
@@ -322,7 +323,7 @@ public class OpenstackClient {
 	
 	public static Status createContainer(String xAuthToken, String tenantid, String containerName){
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+containerName);
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+containerName);
 		
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(ClientResponse.class);
 
@@ -368,7 +369,7 @@ public class OpenstackClient {
 	public static void getFile(ServletOutputStream bos, String xAuthToken, String tenantid, String path ) throws IOException, ClassNotFoundException {
 		Client client = Client.create(returnClientConfig());
 		client.setChunkedEncodingSize(16384);
-		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 		ClientResponse response = tokens.header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
 		
@@ -401,14 +402,14 @@ public class OpenstackClient {
 	 */
 	public static Response getFile2(String xAuthToken, String tenantid, String path ) throws IOException, ClassNotFoundException {
 		StreamingOutput clientOS = null;
-		HttpURLConnection urlconnection =  (HttpURLConnection) new URL(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path).openConnection();
+		HttpURLConnection urlconnection =  (HttpURLConnection) new URL(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path).openConnection();
 		urlconnection.addRequestProperty("X-Auth-Token", xAuthToken);
 		urlconnection.setDoOutput(true);
 		urlconnection.setRequestMethod("GET");
 		
 		int responseCode = urlconnection.getResponseCode();
 		System.out.println(responseCode);
-		System.out.println(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+		System.out.println(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 		
 		if((responseCode >= 200 && responseCode <= 208 )|| responseCode == 226){
 			final InputStream serviceIS = urlconnection.getInputStream();
@@ -438,7 +439,7 @@ public class OpenstackClient {
 		
 		Response.ResponseBuilder r = null;
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portKeystoneAdmin+"/v2.0/users");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
 		
 		JsonObject jsonUserData = new JsonObject();
 		JsonObject jsonUser = new JsonObject();
@@ -465,7 +466,7 @@ public class OpenstackClient {
 	public static JsonObject createNewService(String service, String description,String xAuthToken)  {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portKeystoneAdmin+"/v2.0/tenants");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/tenants");
 		
 		JsonObject jsonTenantData = new JsonObject();
 		JsonObject jsonTenant = new JsonObject();
@@ -490,7 +491,7 @@ public class OpenstackClient {
 	public static JsonObject addUserRole(String tenantid, String userid, String roleid, String xAuthToken)  {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portKeystoneAdmin+"/v2.0/tenants/"+tenantid+"/users/"+userid+"/roles/OS-KSADM/"+roleid);
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/tenants/"+tenantid+"/users/"+userid+"/roles/OS-KSADM/"+roleid);
 		
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(ClientResponse.class);
 
@@ -507,7 +508,7 @@ public class OpenstackClient {
 	public static JsonObject getRoles(String xAuthToken)  {
 	
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portKeystoneAdmin+"/v2.0/OS-KSADM/roles");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/OS-KSADM/roles");
 	
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
@@ -524,7 +525,7 @@ public class OpenstackClient {
 	public static JsonObject getUsers(String xAuthToken)  {
 	
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portKeystoneAdmin+"/v2.0/users");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
 	
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
@@ -540,7 +541,7 @@ public class OpenstackClient {
 	public static JsonObject getImages(String xAuthToken, String tenantId)  {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portNovaMember+"/v2/"+tenantId+"/images/detail");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/images/detail");
 	
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
@@ -556,7 +557,7 @@ public class OpenstackClient {
 	public static JsonObject getInstances(String xAuthToken, String tenantId)  {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portNovaMember+"/v2/"+tenantId+"/servers/detail");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers/detail");
 	
 		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
@@ -572,7 +573,7 @@ public class OpenstackClient {
 	public static JsonObject doActionOnInstance(String xAuthToken, String tenantId, String instanceId, JsonObject action)  {
 		
 		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+openstackIP+portNovaMember+"/v2/"+tenantId+"/servers/"+instanceId+"/action");
+		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers/"+instanceId+"/action");
 	
 		ClientResponse response = tokens.entity(action).type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(ClientResponse.class);
 
