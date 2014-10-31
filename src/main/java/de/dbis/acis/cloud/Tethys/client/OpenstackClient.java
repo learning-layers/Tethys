@@ -119,7 +119,7 @@ public class OpenstackClient {
 			output.add("X-Auth-Token", response.getAsJsonObject("access").getAsJsonObject("token").get("id"));
 			output.add("expires", response.getAsJsonObject("access").getAsJsonObject("token").get("expires"));
 			//output.add("tenant-id", response.getAsJsonObject("access").getAsJsonObject("token").getAsJsonObject("tenant").get("id"));
-			output.addProperty("swift-url", protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+
+			output.addProperty("swift-url", protocol+openstackIPForPublishing+portSwiftMember+"/v1/AUTH_"+
 					response.getAsJsonObject("access").getAsJsonObject("token").getAsJsonObject("tenant").get("id").getAsString());
 		}
 		
