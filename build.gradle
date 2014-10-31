@@ -75,12 +75,12 @@ uploadArchives {
 //}
 
 //Include extraStuff for compilation
-sourceSets.main.compileClasspath += configurations.extraStuff
+sourceSets.main.compileClasspath += [configurations.extraStuff]
 
 // optional: if using 'eclipse' plugin
 eclipse {
   classpath {
-    plusConfigurations += configurations.extraStuff
+    plusConfigurations += [configurations.extraStuff]
   }
 }
 
