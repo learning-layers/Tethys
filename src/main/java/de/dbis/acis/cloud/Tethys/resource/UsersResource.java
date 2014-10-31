@@ -81,15 +81,17 @@ public class UsersResource {
 		@ApiResponse(code = 302, message = "FOUND"),
 	} )
 	public Response getOpenIDLoginPage() {
-		Random rand = new Random();
-		String openIDLoginPageURL =  "http://api.learning-layers.eu/o/oauth2/authorize";
-		openIDLoginPageURL += "?response_type=code";
-		openIDLoginPageURL += "&scope=openid";
-		openIDLoginPageURL += "&client_id=0a8a1de7-1871-41bb-9801-f05acc07414c";
-		long a;
-		while((a = rand.nextLong())<=0){}
-		openIDLoginPageURL += "&state="+a;
-		openIDLoginPageURL += "&redirect_uri=http%3A%2F%2Fcloud11.dbis.rwth-aachen.de%3A8081%2Fusers%2FTODO";
+		//Random rand = new Random();
+		String openIDLoginPageURL =  "http://api.learning-layers.eu/o/oauth2/token?";
+		//openIDLoginPageURL += "response_type=code";
+		//openIDLoginPageURL += "&scope=openid";
+		openIDLoginPageURL += "client_id=59ea03c8-23fe-42d2-9374-4a8be4443f79";
+		openIDLoginPageURL += "&client_secret=AJEK6JzpNVLaV5emCKzv4DhUnR15L0b5mEJXoPmORNdRgHwi43vrmHF1KS9A1QJrKZlh-vnvHgTGtPaaZTbw4xo";
+		//long a;
+		//while((a = rand.nextLong())<=0){}
+		openIDLoginPageURL += "&grant_type=authorization_code";
+		//openIDLoginPageURL += "&state=/";
+		openIDLoginPageURL += "&redirect_uri=http%3A%2F%2Fcloud11.dbis.rwth-aachen.de%3A8081%2Fusers%2FverifyAccessToken";
 
 		return Response.status(302).header("Location", openIDLoginPageURL).build();
 	}
@@ -114,6 +116,25 @@ public class UsersResource {
 			r = Response.status(answer).build();
 		}
 		return r;
+	}
+	
+	/**
+	 * @param accessToken
+	 * @return
+	 */
+	@Path("/verifyAccessToken")
+	@GET
+	public Response verifyAccessToken(@HeaderParam("AccessToken") String accessToken) {
+		
+		if(accessToken == null || accessToken.isEmpty()) {
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		System.out.println("Verify, accessToken:  "+accessToken);
+		
+		JsonObject responseObject = OpenstackClient.verifyAccessToken(accessToken);
+		
+		return Response.ok(responseObject).build();
 	}
 	
 	

@@ -52,6 +52,8 @@ public class OpenstackClient {
 	private static String portSwiftMember = ":8888";
 	private static String portGlanceMember = ":9292";
 	
+	private static String oidcUserinfo = "http://137.226.58.15/o/oauth2/userinfo";
+	
 	/**
 	 * Returns a special ClientConfig to communicate with Openstack.
 	 * 
@@ -580,6 +582,24 @@ public class OpenstackClient {
 		JsonObject output = null;
 		if(response.getClientResponseStatus()==Status.OK) {
 			output = response.getEntity(JsonObject.class);
+		}
+	
+		return output;	
+	}
+
+
+	public static JsonObject verifyAccessToken(String accessToken) {
+		
+		Client client = Client.create(returnClientConfig());
+		WebResource tokens = client.resource(oidcUserinfo);
+	
+		ClientResponse response = tokens.header("Authorization", "Bearer " + accessToken).get(ClientResponse.class);
+
+		JsonObject output = new JsonObject();
+		if(response.getClientResponseStatus()==Status.OK) {
+			output = response.getEntity(JsonObject.class);
+		}else {
+			output.addProperty("StatusCode", response.getClientResponseStatus().getStatusCode());
 		}
 	
 		return output;	
