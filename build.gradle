@@ -2,17 +2,17 @@
 // @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de>
 //
 // use gradle.properties to define parameters
-//
+// see gradle.properties.example for help
 //
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'eclipse'
-apply plugin: 'cargo'
+apply plugin: 'cargo-base'
 
-//task wrapper(type: Wrapper) {gradleVersion = '1.10'}
+import org.gradle.api.plugins.cargo.convention.Deployable
+import org.gradle.api.plugins.cargo.tasks.remote.CargoDeployRemote
 
 sourceCompatibility = 1.7
-
 
 buildscript {
     repositories {
@@ -32,6 +32,7 @@ repositories {
     flatDir { dirs "lib" }
 }
 
+//All needed dependencies, splitted in two groups to reduce size of the created .war
 dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.+'
 
@@ -70,10 +71,6 @@ uploadArchives {
     }
 }
 
-//sourceSets.main {
-//    compileClasspath = configurations.compile//WithExtraStuff
-//}
-
 //Include extraStuff for compilation
 sourceSets.main.compileClasspath += [configurations.extraStuff]
 
@@ -85,22 +82,77 @@ eclipse {
 }
 
 
-cargo {
-    containerId = cargo_containerId
-    port = Integer.parseInt(cargo_port)
-    deployable {
-        context = cargo_deployName
-    }
-    remote {
-        hostname =  cargo_hostname
-        username =  cargo_username
-        password  =  cargo_password
-    }
+
+//Environment class, provides all necessary information of the server for the cargo plugin
+class RemoteEnvironment {
+	String containerId
+	String hostname
+	Integer port
+	String username
+	String password
 }
 
-task print {
-println "Properties:"
-println "Deploy Name: " + cargo_deployName
-println "Remote: " + cargo_containerId + "@" + cargo_hostname + ":" + cargo_port + "?" + cargo_username + ":" + cargo_password 
+//Container class, provides all necessary of the be deployed container for the cargo plugin
+class Container {
+    String name
+    @Nested
+    RemoteEnvironment remoteEnvironment
+    String context
+}
 
+//List of remote action types
+def remoteTypes = ['deploy','redeploy','undeploy']
+
+//Map of all remote server environments
+def remoteEnvironments = [
+	'TethysServer': new RemoteEnvironment(
+		containerId:	cargo_containerId,
+		hostname:		cargo_hostname, 
+		port:			cargo_port as Integer,
+		username:		cargo_username,
+		password:		cargo_password
+	)
+]
+
+//List of all Containers
+def containers = [
+	new Container(
+		name:				cargo_deployName,	
+		context:			cargo_deployName,
+		remoteEnvironment:	remoteEnvironments.get('TethysServer')
+	),
+	new Container(
+		name:				cargo_developName,
+		context:			cargo_developName+cargo_deployName,
+		remoteEnvironment:	remoteEnvironments.get('TethysServer')
+	),
+	new Container(
+		name:				cargo_testName,
+		context:			cargo_testName+cargo_deployName,
+		remoteEnvironment:	remoteEnvironments.get('TethysServer')
+	)
+]		
+
+//Provides all Tasks
+remoteTypes.each { type ->
+	containers.each { config ->
+		//Defines Cargo tasks for specified remote action types and containers 
+		task "remote${type.capitalize()}${config.name.capitalize()}" (type: Class.forName("org.gradle.api.plugins.cargo.tasks.remote.Cargo${type.capitalize()}Remote")) {
+			containerId	= config.remoteEnvironment.containerId
+			port		= config.remoteEnvironment.port
+   			deployables	= [new Deployable(file: file(war.archivePath), context: config.context)]
+	   		hostname	= config.remoteEnvironment.hostname
+   			username	= config.remoteEnvironment.username
+   			password	= config.remoteEnvironment.password
+   			
+   			//Print the used settings before executing the cargo task
+   			doFirst{
+   				println "-------------------------------------"
+   				println "Cargo Settings:"
+   				println "Target: http://${config.remoteEnvironment.hostname}:${config.remoteEnvironment.port}/${config.context}"
+   				println "User credentials: ${config.remoteEnvironment.username}:${config.remoteEnvironment.password}"
+   				println "-------------------------------------"
+   			}
+		}
+	}
 }
