@@ -81,8 +81,6 @@ eclipse {
   }
 }
 
-
-
 //Environment class, provides all necessary information of the server for the cargo plugin
 class RemoteEnvironment {
 	String containerId
@@ -152,6 +150,23 @@ remoteTypes.each { type ->
    				println "Target: http://${config.remoteEnvironment.hostname}:${config.remoteEnvironment.port}/${config.context}"
    				println "User credentials: ${config.remoteEnvironment.username}:${config.remoteEnvironment.password}"
    				println "-------------------------------------"
+   			}
+   			//Manipulate the web.xml so that swagger knows our api.path
+   			doFirst{
+   				war{
+   					eachFile{
+						if (it.name == 'web.xml'){
+							it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': config.context])
+							println "BLA: ${config.context}"
+						}
+					}
+				}
+				compileJava.execute()
+				processResources.execute()
+				classes.execute()
+				war.execute()
+				assemble.execute()
+				build.execute()
    			}
 		}
 	}

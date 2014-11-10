@@ -35,7 +35,7 @@
   </init-param>
   <init-param>
     <param-name>swagger.api.basepath</param-name>
-    <param-value>http://137.226.58.11:8081/Tethys</param-value>
+    <param-value>http://137.226.58.11:8081/@Tethys@</param-value>
   </init-param>
   <init-param>
       <param-name>swagger.filter</param-name>
