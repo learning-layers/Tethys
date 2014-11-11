@@ -12,6 +12,10 @@ apply plugin: 'cargo-base'
 import org.gradle.api.plugins.cargo.convention.Deployable
 import org.gradle.api.plugins.cargo.tasks.remote.CargoDeployRemote
 
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.1'
+}
+
 sourceCompatibility = 1.7
 
 buildscript {
