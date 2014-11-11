@@ -91,6 +91,14 @@ uploadArchives {
     }
 }
 
+war{
+	eachFile{
+		if (it.name == 'web.xml'){
+			it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': 'Tethys'])
+		}
+	}
+}
+
 //------------
 //Classes For cargo tasks
 //------------
@@ -156,29 +164,29 @@ remoteTypes.each { type ->
 		task "remote${type.capitalize()}${config.name.capitalize()}" (type: Class.forName("org.gradle.api.plugins.cargo.tasks.remote.Cargo${type.capitalize()}Remote")) {
 			containerId	= config.remoteEnvironment.containerId
 			port		= config.remoteEnvironment.port
-   			deployables	= [new Deployable(file: file(war.archivePath), context: config.context)]
-	   		hostname	= config.remoteEnvironment.hostname
-   			username	= config.remoteEnvironment.username
-   			password	= config.remoteEnvironment.password
-   			
-   			//Print the used settings before executing the cargo task
-   			doFirst{
-   				println "-------------------------------------"
-   				println "Cargo Settings:"
-   				println "Target: http://${config.remoteEnvironment.hostname}:${config.remoteEnvironment.port}/${config.context}"
-   				println "User credentials: ${config.remoteEnvironment.username}:${config.remoteEnvironment.password}"
-   				println "-------------------------------------"
-   			}
-   			//Manipulate the web.xml so that swagger knows our api.path
-   			doFirst{
-   				war{
-   					eachFile{
+			deployables	= [new Deployable(file: file(war.archivePath), context: config.context)]
+   	 		hostname	= config.remoteEnvironment.hostname
+			username	= config.remoteEnvironment.username
+			password	= config.remoteEnvironment.password
+		
+			//Print the used settings before executing the cargo task
+			doFirst{
+				println "-------------------------------------"
+				println "Cargo Settings:"
+				println "Target: http://${config.remoteEnvironment.hostname}:${config.remoteEnvironment.port}/${config.context}"
+				println "User credentials: ${config.remoteEnvironment.username}:${config.remoteEnvironment.password}"
+				println "-------------------------------------"
+			}
+			//Manipulate the web.xml so that swagger knows our api.path
+			doFirst{
+				war{
+					eachFile{
 						if (it.name == 'web.xml'){
 							it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': config.context])
 						}
 					}
 				}
-				
+			
 				//Only put swagger .jars into .war (without transitions)
 				sourceSets.main.runtimeClasspath = files([configurations.remoteRuntime])
 				println ":compileJava"
