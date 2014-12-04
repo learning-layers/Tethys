@@ -188,7 +188,9 @@ remoteTypes.each { type ->
 				}
 			
 				//Only put swagger .jars into .war (without transitions)
-				sourceSets.main.runtimeClasspath = files([configurations.remoteRuntime])
+				sourceSets.main.runtimeClasspath -= files([configurations.testCompile])
+				sourceSets.main.runtimeClasspath -= files([configurations.compile])
+				sourceSets.main.runtimeClasspath += files([configurations.remoteRuntime])
 				println ":compileJava"
 				compileJava.execute()
 				println ":processResources"
