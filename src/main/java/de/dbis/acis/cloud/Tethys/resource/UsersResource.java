@@ -25,6 +25,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 import de.dbis.acis.cloud.Tethys.client.OpenstackClient;
+import de.dbis.acis.cloud.Tethys.entity.LDAP.LDAPUserInfo;
 import de.dbis.acis.cloud.Tethys.util.GsonExclusionStrategy;
 
 /**
@@ -82,7 +83,7 @@ public class UsersResource {
 	} )
 	public Response getOpenIDLoginPage() {
 		//Random rand = new Random();
-		String openIDLoginPageURL =  "http://api.learning-layers.eu/o/oauth2/token?";
+		String openIDLoginPageURL =  "https://api.learning-layers.eu/o/oauth2/token?";
 		//openIDLoginPageURL += "response_type=code";
 		//openIDLoginPageURL += "&scope=openid";
 		openIDLoginPageURL += "client_id=59ea03c8-23fe-42d2-9374-4a8be4443f79";
@@ -100,20 +101,19 @@ public class UsersResource {
 	 * @return
 	 */
 	@POST
-	@Path("/users/{sub}")
-	//@Consumes( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
+	@Path("/{uid}")
+	//@Produces( { MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_FORM_URLENCODED } )
 	@ApiOperation(value="Creates User with LDAP User Data")
 	@ApiResponses( {
-		@ApiResponse(code = 200, message = "OK")
+		@ApiResponse(code = 201, message = "Created"),
+		@ApiResponse(code = 202, message = "Accepted")
 	} )
-	public Response createStorage(@PathParam("sub") String sub, @HeaderParam("pw") String pw){
+	public Response createStorage(@PathParam("uid") String uid, @HeaderParam("PW") String pw){
 		Response r = null;
-		
-		if(pw.equals("useanotherpw")){
-		
-		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());
-		com.sun.jersey.api.client.ClientResponse.Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), "user_"+sub);
-			r = Response.status(answer).build();
+		if(pw != null && pw.equals("useanotherpw")){
+			JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());
+			com.sun.jersey.api.client.ClientResponse.Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), uid);
+			r = Response.ok().status(answer).build();
 		}
 		return r;
 	}
@@ -124,15 +124,17 @@ public class UsersResource {
 	 */
 	@Path("/verifyAccessToken")
 	@GET
-	public Response verifyAccessToken(@HeaderParam("AccessToken") String accessToken) {
+	@ApiOperation(value="Method in Testing - Verify LDAP Access")
+	@ApiResponses( {
+		@ApiResponse(code = 200, message = "OK")
+	} )
+	public Response verifyAccessToken(@HeaderParam("Authorization") String accessToken) {
 		
 		if(accessToken == null || accessToken.isEmpty()) {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		System.out.println("Verify, accessToken:  "+accessToken);
-		
-		JsonObject responseObject = OpenstackClient.verifyAccessToken(accessToken);
+		LDAPUserInfo responseObject = OpenstackClient.verifyAccessToken(accessToken);
 		
 		return Response.ok(responseObject).build();
 	}

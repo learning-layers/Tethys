@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,6 +28,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
+import de.dbis.acis.cloud.Tethys.entity.LDAP.LDAPUserInfo;
 import de.dbis.acis.cloud.Tethys.message.client.MessageAuth;
 import de.dbis.acis.cloud.Tethys.message.server.SMessageAuth;
 import de.dbis.acis.cloud.Tethys.util.GsonMessageBodyHandler;
@@ -52,7 +52,9 @@ public class OpenstackClient {
 	private static String portSwiftMember = ":8888";
 	private static String portGlanceMember = ":9292";
 	
-	private static String oidcUserinfo = "http://137.226.58.15/o/oauth2/userinfo";
+	//private static String oidcUserinfo = "http://137.226.58.15/o/oauth2/userinfo";
+	private static String oidcUserinfo = "https://api.learning-layers.eu/o/oauth2/userinfo";
+	
 	
 	/**
 	 * Returns a special ClientConfig to communicate with Openstack.
@@ -588,18 +590,16 @@ public class OpenstackClient {
 	}
 
 
-	public static JsonObject verifyAccessToken(String accessToken) {
+	public static LDAPUserInfo verifyAccessToken(String accessToken) {
 		
 		Client client = Client.create(returnClientConfig());
 		WebResource tokens = client.resource(oidcUserinfo);
-	
-		ClientResponse response = tokens.header("Authorization", "Bearer " + accessToken).get(ClientResponse.class);
+		System.out.println("curl -X GET -H 'Authorization: "+accessToken+"' "+oidcUserinfo);
+		ClientResponse response = tokens.header("Authorization", accessToken).get(ClientResponse.class);
 
-		JsonObject output = new JsonObject();
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
-		}else {
-			output.addProperty("StatusCode", response.getClientResponseStatus().getStatusCode());
+		LDAPUserInfo output = new LDAPUserInfo();
+		if(response !=null) {
+			output = response.getEntity(LDAPUserInfo.class);
 		}
 	
 		return output;	
