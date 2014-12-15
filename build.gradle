@@ -38,24 +38,25 @@ repositories {
 //------------
 List swagger = [
 	'com.wordnik:swagger-annotations:1.3.2', 
-	'com.wordnik:swagger-core_2.10:1.3.2',
-	'com.wordnik:swagger-jaxrs_2.10:1.3.2',
-	'com.wordnik:swagger-jersey-jaxrs_2.10:1.3.2'
+//	'com.wordnik:swagger-core_2.10:1.3.2',
+//	'com.wordnik:swagger-jaxrs_2.10:1.3.2',
+//	'com.wordnik:swagger-jersey-jaxrs_2.10:1.3.2',
 ]
 
 List javax = [
-	'javax.persistence:persistence-api:1.0',
-	'javax.ws.rs:jsr311-api:1.1.1'
+	'javax.persistence:persistence-api:1.0'
 ]
-
+//	'javax.ws.rs:javax.ws.rs-api:2.0',
 List jersey = [
-	'com.sun.jersey:jersey-json:1.13',
-	'com.sun.jersey:jersey-server:1.13',
-	'com.sun.jersey:jersey-core:1.13',
-	'com.sun.jersey:jersey-servlet:1.13'
+	'org.glassfish.jersey.ext:jersey-proxy-client:2.13',
+	'org.glassfish.jersey.containers:jersey-container-servlet:2.13',
+//	'com.sun.jersey:jersey-json:1.18.3',
+//	'com.sun.jersey:jersey-server:1.18.3',
+//	'com.sun.jersey:jersey-core:1.18.3',
+//	'com.sun.jersey:jersey-servlet:1.18.3'
 ]
 
-List apache = ['org.apache.tomcat:tomcat-servlet-api:7.0.37']
+List apache = []//['org.apache.tomcat:tomcat-servlet-api:7.0.37']
 List google = ['com.google.code.gson:gson:2.2.4']
 List mysql = ['mysql:mysql-connector-java:5.1.26']
 
@@ -64,7 +65,7 @@ List mysql = ['mysql:mysql-connector-java:5.1.26']
 //------------
 configurations {
 	remoteRuntime{
-		transitive = false
+//		transitive = false
 	}
 }
 
@@ -74,7 +75,7 @@ configurations {
 dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.+'
 	
-	compile swagger, javax, jersey, apache, google, mysql
+	compile javax, jersey, apache, google, mysql, swagger
 	
 	remoteRuntime swagger
 }
@@ -91,13 +92,13 @@ uploadArchives {
     }
 }
 
-war{
-	eachFile{
-		if (it.name == 'web.xml'){
-			it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': 'Tethys'])
-		}
-	}
-}
+//war{
+//	eachFile{
+//		if (it.name == 'web.xml'){
+//			it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': 'Tethys'])
+//		}
+//	}
+//}
 
 //------------
 //Classes For cargo tasks
@@ -188,9 +189,9 @@ remoteTypes.each { type ->
 				}
 			
 				//Only put swagger .jars into .war (without transitions)
-				sourceSets.main.runtimeClasspath -= files([configurations.testCompile])
-				sourceSets.main.runtimeClasspath -= files([configurations.compile])
-				sourceSets.main.runtimeClasspath += files([configurations.remoteRuntime])
+				//sourceSets.main.runtimeClasspath -= files([configurations.testCompile])
+				//sourceSets.main.runtimeClasspath -= files([configurations.compile])
+				//sourceSets.main.runtimeClasspath += files([configurations.remoteRuntime])
 				println ":compileJava"
 				compileJava.execute()
 				println ":processResources"
