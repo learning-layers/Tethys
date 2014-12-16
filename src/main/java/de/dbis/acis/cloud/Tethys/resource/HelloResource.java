@@ -1,5 +1,6 @@
 package de.dbis.acis.cloud.Tethys.resource;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,8 +22,9 @@ import de.dbis.acis.cloud.Tethys.proxy.openstack.keystone.v2_0.ProxyKeystoneVers
 @Api(value="/hello", description = "A description of our HelloResource")
 public class HelloResource {
 	
-	ProxyKeystoneVersions proxyKeystoneVersion = WebResourceFactory.newResource(ProxyKeystoneVersions.class, ClientBuilder.newClient().target("http://137.226.58.2:5000"));
-
+//	ProxyKeystoneVersions proxyKeystoneVersion = WebResourceFactory.newResource(ProxyKeystoneVersions.class, ClientBuilder.newClient().target("http://137.226.58.2:5000"));
+	@Inject 
+	ProxyKeystoneVersions proxyKeystoneVersion;
 	
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
