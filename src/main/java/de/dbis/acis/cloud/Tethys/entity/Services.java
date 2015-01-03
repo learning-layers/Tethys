@@ -1,5 +1,6 @@
 package de.dbis.acis.cloud.Tethys.entity;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -25,8 +26,13 @@ import com.google.gson.annotations.Expose;
 	@NamedNativeQuery(name = "Services.findServiceByName", query = "SELECT * FROM Services s where s.NAME= :name",resultClass=Services.class)
 	
 })
-public class Services {
+public class Services implements Serializable {
 	 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@Column(name = "ID", nullable = false)
 	private int id;
@@ -34,7 +40,7 @@ public class Services {
 	@Column(name = "NAME", nullable = false)
 	private String name;
 	
-	@Expose(serialize = false, deserialize = false)
+//	@Expose(serialize = false, deserialize = false)
 	@Column(name = "TENANTID", nullable = false)
 	private String tenantid;
 		

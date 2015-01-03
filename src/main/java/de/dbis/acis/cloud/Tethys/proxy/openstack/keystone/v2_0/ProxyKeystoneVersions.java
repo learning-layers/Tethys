@@ -7,6 +7,11 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.gson.JsonObject;
 
+/**
+ * JAX-RS annotated Interface for Openstack Keystone. We will use it to generate Proxies.
+ * 
+ * @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de>
+ */
 @Path("/")
 public interface ProxyKeystoneVersions {
 

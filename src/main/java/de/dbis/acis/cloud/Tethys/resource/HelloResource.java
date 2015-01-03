@@ -18,11 +18,15 @@ import com.wordnik.swagger.annotations.ApiResponses;
 
 import de.dbis.acis.cloud.Tethys.proxy.openstack.keystone.v2_0.ProxyKeystoneVersions;
 
+/**
+ * Class for Testing purposes.
+ * 
+ * @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de>
+ */
 @Path("/hello")
 @Api(value="/hello", description = "A description of our HelloResource")
 public class HelloResource {
 	
-//	ProxyKeystoneVersions proxyKeystoneVersion = WebResourceFactory.newResource(ProxyKeystoneVersions.class, ClientBuilder.newClient().target("http://137.226.58.2:5000"));
 	@Inject 
 	ProxyKeystoneVersions proxyKeystoneVersion;
 	

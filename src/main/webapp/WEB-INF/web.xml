@@ -33,7 +33,6 @@
 <!-- 	<servlet> -->
 <!--   <servlet-name>JerseyJaxrsConfig</servlet-name> -->
 <!--   <servlet-class>com.wordnik.swagger.jersey.config.JerseyJaxrsConfig</servlet-class> -->
-<!--   <servlet-class> com.wordnik.swagger.jaxrs.config.DefaultJaxrsConfig</servlet-class> -->
 <!--   <init-param> -->
 <!--     <param-name>api.version</param-name> -->
 <!--     <param-value>1.0.0</param-value> -->
@@ -49,14 +48,13 @@
 <!--   <load-on-startup>1</load-on-startup> -->
 <!-- </servlet> -->
 
-<!-- <filter> -->
-<!--   <filter-name>CorsFilter</filter-name> -->
-<!--   <filter-class>de.dbis.acis.cloud.Tethys.util.CORSFilter</filter-class> -->
-<!-- </filter> -->
-<!-- <filter-mapping> -->
-<!--   <filter-name>CorsFilter</filter-name> -->
-<!--   <url-pattern>/*</url-pattern> -->
-<!-- </filter-mapping> -->
-
+<filter>
+  <filter-name>CorsFilter</filter-name>
+  <filter-class>de.dbis.acis.cloud.Tethys.util.CORSFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>CorsFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
 
 </web-app>

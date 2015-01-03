@@ -5,6 +5,11 @@ import javax.ws.rs.client.ClientBuilder;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 
+/**
+ * Factory to create Proxy classes. Testing Purposes.
+ * 
+ * @author Gordon Lawrenz <lawrenz@dbis.rwth-aachen.de>
+ */
 public class ProxyFactory<T> implements Factory<T> {
 
 	private Class<T> t;

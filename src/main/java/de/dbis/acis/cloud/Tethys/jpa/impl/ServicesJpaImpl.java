@@ -17,14 +17,10 @@ import de.dbis.acis.cloud.Tethys.util.JPAHelper;
  */
 public class ServicesJpaImpl implements ServicesJpa{
 
-	private EntityManager entityManager;
-	
-	protected EntityManager getEntityManager() {
-		return entityManager;
-	}
+	private EntityManager entityManager; 
 	
 	public ServicesJpaImpl() {
-		entityManager= JPAHelper.getInstance().createEntityManager();
+		entityManager = JPAHelper.getTethysEntityManager().createEntityManager();
 	}
 	
 	@Override
