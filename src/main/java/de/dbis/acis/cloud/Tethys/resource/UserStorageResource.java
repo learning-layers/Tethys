@@ -5,7 +5,6 @@ import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -53,7 +52,7 @@ public class UserStorageResource {
 		Response r = null;
 		
 //		CHECK IF ISS/SUB is right ELSE NO ACCESS
-		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());		
+		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());		
 		
 //		LOGG
 		System.out.println("SUB:"+sub);
@@ -89,7 +88,7 @@ public class UserStorageResource {
 		Response.ResponseBuilder r = null;
 		
 //		CHECK IF ISS/SUB is right ELSE NO ACCESS
-		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());	
+		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());	
 		
 //		LOGG
 		System.out.println("SUB:"+sub);
@@ -118,7 +117,7 @@ public class UserStorageResource {
 		
 //		CHECK IF ISS/SUB is right ELSE NO ACCESS
 
-		JsonObject key = OpenstackClient.adminAuth(this.getSwiftCredentials());	
+		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());	
 		
 //		LOGG
 		System.out.println("SUB:" + sub);

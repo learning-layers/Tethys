@@ -10,8 +10,6 @@ import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.Table;
 
-import com.google.gson.annotations.Expose;
-
 
 /**
  * Represents the Services-Entity.

@@ -4,23 +4,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import com.google.gson.JsonArray;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-
-import de.dbis.acis.cloud.Tethys.client.OpenstackClient;
-import de.dbis.acis.cloud.Tethys.entity.Services;
-import de.dbis.acis.cloud.Tethys.jpa.ServicesJpa;
-import de.dbis.acis.cloud.Tethys.jpa.impl.ServicesJpaImpl;
 
 /**
  * This SubResource matches the URL /i5Cloud/services/{service-id}/{container}
@@ -31,14 +21,14 @@ import de.dbis.acis.cloud.Tethys.jpa.impl.ServicesJpaImpl;
 @Api(value="/services/{service-id}/storage", description = "Operations about Files & Container")
 public class ServiceStorageResource {
 
-	private ServicesJpa servicesService;
+//	private ServicesJpa servicesService;
 	
-	/**
-	 * Class Constructor
-	 */
-	public ServiceStorageResource() {
-		servicesService = new ServicesJpaImpl();
-	}
+//	/**
+//	 * Class Constructor
+//	 */
+//	public ServiceStorageResource() {
+//		servicesService = new ServicesJpaImpl();
+//	}
 	
 	
 	@Path("/{storage}")

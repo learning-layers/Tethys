@@ -1,12 +1,9 @@
 package de.dbis.acis.cloud.Tethys.resource;
 
 
-import java.util.Random;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -15,10 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.glassfish.jersey.client.ClientResponse;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -26,7 +19,6 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 
 import de.dbis.acis.cloud.Tethys.client.OpenstackClient;
-import de.dbis.acis.cloud.Tethys.util.GsonExclusionStrategy;
 
 /**
  * This SubResource matches the URL /i5Cloud/users
@@ -37,8 +29,8 @@ import de.dbis.acis.cloud.Tethys.util.GsonExclusionStrategy;
 @Api(value="/users", description = "Operations about users", position = 3)
 public class UsersResource {
 
-	private Gson gson = new Gson();
-	private Gson gsonExternal = new GsonBuilder().setExclusionStrategies(new GsonExclusionStrategy()).create();
+//	private Gson gson = new Gson();
+//	private Gson gsonExternal = new GsonBuilder().setExclusionStrategies(new GsonExclusionStrategy()).create();
 	
 	//curl -X POST http://137.226.58.11:8081/i5Cloud/users -H 'X-Auth-Token: 88a6923e7a8f45bab034a7aacd191120' -H 'Content-Type: application/json' -d '{"name":"1","password":"1"}'
 	/**

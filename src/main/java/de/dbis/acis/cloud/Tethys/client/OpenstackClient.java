@@ -1,6 +1,5 @@
 package de.dbis.acis.cloud.Tethys.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+
 
 //import javax.servlet.ServletOutputStream;
 import javax.ws.rs.WebApplicationException;
@@ -50,6 +50,7 @@ public class OpenstackClient {
 	private static String portKeystoneMember = ":5000";
 	private static String portNovaMember = ":8774";
 	private static String portSwiftMember = ":8888";
+	@SuppressWarnings("unused")
 	private static String portGlanceMember = ":9292";
 	
 	private static String oidcUserinfo = "http://137.226.58.15/o/oauth2/userinfo";
@@ -438,7 +439,6 @@ public class OpenstackClient {
 
 	public static JsonObject createNewUser(String xAuthToken, String name, String password, String email, String tenantId, Boolean enabled  )  {
 		
-		Response.ResponseBuilder r = null;
 		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
 		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
 		

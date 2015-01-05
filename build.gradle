@@ -37,10 +37,10 @@ repositories {
 //Lists for easier dependency management
 //------------
 List swagger = [
-	'com.wordnik:swagger-annotations:1.3.2',
+	'com.wordnik:swagger-annotations:1.3.12',
 //	'com.wordnik:swagger-core_2.11:1.3.12',
 //	'com.wordnik:swagger-jaxrs_2.11:1.3.12',
-//	'com.wordnik:swagger-jersey2-jaxrs_2.11:1.3.12',
+	'com.wordnik:swagger-jersey2-jaxrs_2.11:1.3.12',
 //	'com.wordnik:swagger-core_2.10:1.3.2',
 //	'com.wordnik:swagger-jaxrs_2.10:1.3.2',
 //	'com.wordnik:swagger-jersey-jaxrs_2.10:1.3.2',
@@ -48,6 +48,8 @@ List swagger = [
 
 List javax = [
 //	'javax.persistence:persistence-api:1.0',
+//	'javax.servlet:servlet-api:2.5',
+	'javax.servlet:javax.servlet-api:3.0.1',
 	'org.eclipse.persistence:javax.persistence:2.1.0'
 ]
 
@@ -65,7 +67,7 @@ List hibernate = [
 	'org.hibernate:hibernate-validator:4.2.0.Final',
 ]
 
-List apache = ['org.apache.tomcat:tomcat-servlet-api:7.0.37']
+List apache = []//'org.apache.tomcat:tomcat-servlet-api:7.0.37']
 List google = ['com.google.code.gson:gson:2.2.4']
 List mysql = ['mysql:mysql-connector-java:5.1.34']
 
@@ -87,7 +89,8 @@ dependencies {
 	compile javax, jersey, apache, google, mysql, swagger, hibernate
 	
 	//swagger is a servlet itself so it need to be deployed within the war and cannot be in the lib of the webserver
-	remoteRuntime swagger
+	//jersey-container-servlet needs to be shipped! it's atm not on the server
+	remoteRuntime swagger, jersey
 }
 
 test {

@@ -1,8 +1,6 @@
 package de.dbis.acis.cloud.Tethys.resource;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
