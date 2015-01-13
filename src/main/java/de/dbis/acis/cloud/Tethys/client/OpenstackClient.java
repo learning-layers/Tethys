@@ -1,6 +1,5 @@
 package de.dbis.acis.cloud.Tethys.client;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,23 +9,25 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.servlet.ServletOutputStream;
+
+//import javax.servlet.ServletOutputStream;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
+
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.client.JerseyClient;
+import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.client.JerseyWebTarget;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 import de.dbis.acis.cloud.Tethys.entity.LDAP.LDAPUserInfo;
 import de.dbis.acis.cloud.Tethys.message.client.MessageAuth;
@@ -50,6 +51,7 @@ public class OpenstackClient {
 	private static String portKeystoneMember = ":5000";
 	private static String portNovaMember = ":8774";
 	private static String portSwiftMember = ":8888";
+	@SuppressWarnings("unused")
 	private static String portGlanceMember = ":9292";
 	
 	//private static String oidcUserinfo = "http://137.226.58.15/o/oauth2/userinfo";
@@ -63,9 +65,9 @@ public class OpenstackClient {
 	 */
 	private static ClientConfig returnClientConfig() {
 		if(cfg == null) {
-			cfg = new DefaultClientConfig();
+			cfg = new ClientConfig();
 			cfg.getClasses().add(GsonMessageBodyHandler.class);
-			cfg.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
+//			cfg.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
 		}
 		return cfg;
 	}
@@ -84,15 +86,14 @@ public class OpenstackClient {
 	 * @return JsonObject
 	 */
 	public static JsonObject authOpenstack(SMessageAuth smessage, boolean admin) {
-		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+ (admin?portKeystoneAdmin:portKeystoneMember) +"/v2.0/tokens");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+ (admin?portKeystoneAdmin:portKeystoneMember) +"/v2.0/tokens");
 		MessageAuth message = new MessageAuth(smessage);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,message);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).post(Entity.entity(message,MediaType.APPLICATION_JSON),ClientResponse.class);
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 		
 		return output;		  
@@ -170,14 +171,14 @@ public class OpenstackClient {
 	 */
 	public static JsonObject serviceLimits(String xAuthToken, String tenantId) {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/limits");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/limits");
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 		JsonObject output = null;
 		
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 		
 		return output;
@@ -199,8 +200,8 @@ public class OpenstackClient {
 	 */
 	public static JsonObject createInstance(String xAuthToken, String tenantId, JsonElement name, JsonElement script, JsonElement imageRef ,JsonElement flavorRef) {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers");
 		
 		JsonObject request = new JsonObject();	
 		JsonObject serverdata = new JsonObject();
@@ -212,11 +213,11 @@ public class OpenstackClient {
         serverdata.addProperty("min_count", "1");
         request.add("server", serverdata);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,request);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(Entity.entity(request,MediaType.APPLICATION_JSON),ClientResponse.class);
 		JsonObject output = null;
 		
-		if(response.getClientResponseStatus()==Status.ACCEPTED) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.ACCEPTED) {
+			output = response.readEntity(JsonObject.class);
 		}
 
 		return output;
@@ -310,15 +311,15 @@ public class OpenstackClient {
 	 */
 	public static JsonArray getUploadedFiles(String xAuthToken, String tenantid, String path ) {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
 		JsonArray output = null;
 		
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonArray.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonArray.class);
 		}
 		
 		return output;
@@ -326,13 +327,13 @@ public class OpenstackClient {
 	}
 	
 	public static Status createContainer(String xAuthToken, String tenantid, String containerName){
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+containerName);
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+containerName);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(null,ClientResponse.class);
 
 		
-		return response.getClientResponseStatus();
+		return (Status) response.getStatusInfo();
 	}
 	
 //	/**
@@ -346,9 +347,9 @@ public class OpenstackClient {
 //	 * @throws ClassNotFoundException
 //	 */
 //	public static ResponseBuilder getFile(String xAuthToken, String tenantid, String path ) throws IOException, ClassNotFoundException {
-//		Client client = Client.create(returnClientConfig());
+//		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
 //		client.setChunkedEncodingSize(16384);
-//		WebResource tokens = client.resource(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+//		JerseyWebTarget tokens = client.target(protocol+openstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
 //		ClientResponse response = tokens.header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 //
 //		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -360,39 +361,39 @@ public class OpenstackClient {
 //		
 //	}
 	
-	/**
-	 * Gets a file from a given container of a service/tenant in Swift.
-	 * 
-	 * @param xAuthToken
-	 * @param tenantid
-	 * @param path
-	 * @return the file
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	public static void getFile(ServletOutputStream bos, String xAuthToken, String tenantid, String path ) throws IOException, ClassNotFoundException {
-		Client client = Client.create(returnClientConfig());
-		client.setChunkedEncodingSize(16384);
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
-		ClientResponse response = tokens.header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
-
-		
-		InputStream bis = response.getEntityInputStream();
-		
-		
-		int i;
-		
-		while ((i = bis.read()) != -1) {
-			bos.write(i);
-		}
-		
-		bis.close();
-		bos.flush();
-		bos.close();
-
-		//return Response.ok().type(response.getType());
-		
-	}
+//	/**
+//	 * Gets a file from a given container of a service/tenant in Swift.
+//	 * 
+//	 * @param xAuthToken
+//	 * @param tenantid
+//	 * @param path
+//	 * @return the file
+//	 * @throws IOException
+//	 * @throws ClassNotFoundException
+//	 */
+//	public static void getFile(ServletOutputStream bos, String xAuthToken, String tenantid, String path ) throws IOException, ClassNotFoundException {
+//		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+//		client.setChunkedEncodingSize(16384);
+//		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portSwiftMember+"/v1/AUTH_"+tenantid+"/"+path);
+//		ClientResponse response = tokens.header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+//
+//		
+//		InputStream bis = response.getEntityInputStream();
+//		
+//		
+//		int i;
+//		
+//		while ((i = bis.read()) != -1) {
+//			bos.write(i);
+//		}
+//		
+//		bis.close();
+//		bos.flush();
+//		bos.close();
+//
+//		//return Response.ok().type(response.getType());
+//		
+//	}
 	
 	/**
 	 * Gets a file from a given container of a service/tenant in Swift.
@@ -441,9 +442,8 @@ public class OpenstackClient {
 
 	public static JsonObject createNewUser(String xAuthToken, String name, String password, String email, String tenantId, Boolean enabled  )  {
 		
-		Response.ResponseBuilder r = null;
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
 		
 		JsonObject jsonUserData = new JsonObject();
 		JsonObject jsonUser = new JsonObject();
@@ -454,11 +454,11 @@ public class OpenstackClient {
 		jsonUserData.addProperty("enabled", enabled);
 		jsonUser.add("user", jsonUserData);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).entity(jsonUser).header("X-Auth-Token", xAuthToken).post(ClientResponse.class,jsonUser);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(Entity.entity(jsonUser,MediaType.APPLICATION_JSON),ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 		
 		return output;	
@@ -469,8 +469,8 @@ public class OpenstackClient {
 //	REQ BODY: {"tenant": {"enabled": true, "name": "TestUser", "description": null}}
 	public static JsonObject createNewService(String service, String description,String xAuthToken)  {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/tenants");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/tenants");
 		
 		JsonObject jsonTenantData = new JsonObject();
 		JsonObject jsonTenant = new JsonObject();
@@ -479,11 +479,11 @@ public class OpenstackClient {
 		jsonTenantData.addProperty("enabled", true);
 		jsonTenant.add("tenant", jsonTenantData);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(ClientResponse.class,jsonTenant);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(Entity.entity(jsonTenant,MediaType.APPLICATION_JSON),ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 		
 		return output;	
@@ -494,14 +494,14 @@ public class OpenstackClient {
 //	curl -X PUT -H 'X-Auth-Token:<token>' https://localhost:35357/v2.0/tenants/<tenantid>/users/<userid>/roles/OS-KSADM/<role-id>
 	public static JsonObject addUserRole(String tenantid, String userid, String roleid, String xAuthToken)  {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/tenants/"+tenantid+"/users/"+userid+"/roles/OS-KSADM/"+roleid);
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/tenants/"+tenantid+"/users/"+userid+"/roles/OS-KSADM/"+roleid);
 		
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).put(null,ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 		
 		return output;		
@@ -511,14 +511,14 @@ public class OpenstackClient {
 //	curl -i http://137.226.58.2:35357/v2.0/OS-KSADM/roles -X GET -H "X-Auth-Token: "	
 	public static JsonObject getRoles(String xAuthToken)  {
 	
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/OS-KSADM/roles");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/OS-KSADM/roles");
 	
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 	
 		return output;		
@@ -528,14 +528,14 @@ public class OpenstackClient {
 //	curl -i http://137.226.58.142:35357/v2.0/users -X GET  -H "X-Auth-Token: "
 	public static JsonObject getUsers(String xAuthToken)  {
 	
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portKeystoneAdmin+"/v2.0/users");
 	
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 	
 		return output;	
@@ -544,14 +544,14 @@ public class OpenstackClient {
 	//curl -i http://137.226.58.142:8774/v2/d34a0c1691fd4bf6b89214e2731c0b33/images/detail -X GET -H "X-Auth-Token: 4ffb1aa188804dd4bce98e4ce11d8839"
 	public static JsonObject getImages(String xAuthToken, String tenantId)  {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/images/detail");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/images/detail");
 	
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 	
 		return output;	
@@ -560,14 +560,14 @@ public class OpenstackClient {
 	//curl -i http://137.226.58.142:8774/v2/d34a0c1691fd4bf6b89214e2731c0b33/servers/detail -X GET  -H "X-Auth-Token: e8e4949e56ab4072be08287d3fd52d3d"
 	public static JsonObject getInstances(String xAuthToken, String tenantId)  {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers/detail");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers/detail");
 	
-		ClientResponse response = tokens.accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).get(ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 	
 		return output;	
@@ -576,14 +576,14 @@ public class OpenstackClient {
 	//curl -i http://137.226.58.142:8774/v2/d34a0c1691fd4bf6b89214e2731c0b33/servers/44268c11-64d9-4b7b-95ea-d63f28c6db5f/action -X POST -H "Content-Type: application/json" -H "Accept: application/json" -H "X-Auth-Token: 67bdf0dc06f04d8fb75dfe27ba946ca6" -d '{"os-start": null}'
 	public static JsonObject doActionOnInstance(String xAuthToken, String tenantId, String instanceId, JsonObject action)  {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers/"+instanceId+"/action");
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(protocol+internalOpenstackIP+portNovaMember+"/v2/"+tenantId+"/servers/"+instanceId+"/action");
 	
-		ClientResponse response = tokens.entity(action).type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(ClientResponse.class);
+		ClientResponse response = tokens.request().accept(MediaType.APPLICATION_JSON).header("X-Auth-Token", xAuthToken).post(Entity.entity(action,MediaType.APPLICATION_JSON),ClientResponse.class);
 
 		JsonObject output = null;
-		if(response.getClientResponseStatus()==Status.OK) {
-			output = response.getEntity(JsonObject.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(JsonObject.class);
 		}
 	
 		return output;	
@@ -592,14 +592,15 @@ public class OpenstackClient {
 
 	public static LDAPUserInfo verifyAccessToken(String accessToken) {
 		
-		Client client = Client.create(returnClientConfig());
-		WebResource tokens = client.resource(oidcUserinfo);
+		JerseyClient client = JerseyClientBuilder.createClient(returnClientConfig());
+		JerseyWebTarget tokens = client.target(oidcUserinfo);
+	
 		System.out.println("curl -X GET -H 'Authorization: "+accessToken+"' "+oidcUserinfo);
-		ClientResponse response = tokens.header("Authorization", accessToken).get(ClientResponse.class);
+		ClientResponse response = tokens.request().header("Authorization", accessToken).get(ClientResponse.class);
 
 		LDAPUserInfo output = new LDAPUserInfo();
-		if(response !=null) {
-			output = response.getEntity(LDAPUserInfo.class);
+		if(response.getStatusInfo()==Status.OK) {
+			output = response.readEntity(LDAPUserInfo.class);
 		}
 	
 		return output;	

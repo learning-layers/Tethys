@@ -2,7 +2,6 @@ package de.dbis.acis.cloud.Tethys.jpa;
 
 import java.util.List;
 
-
 import de.dbis.acis.cloud.Tethys.entity.Services;
 
 /**

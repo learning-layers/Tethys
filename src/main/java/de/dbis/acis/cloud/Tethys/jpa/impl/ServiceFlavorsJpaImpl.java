@@ -23,7 +23,7 @@ public class ServiceFlavorsJpaImpl implements ServiceFlavorsJpa {
 	}
 	
 	public ServiceFlavorsJpaImpl() {
-		entityManager= JPAHelper.getInstance().createEntityManager();
+		entityManager= JPAHelper.getTethysEntityManager().createEntityManager();
 	}
 	
 	@Override

@@ -16,7 +16,7 @@ import com.mysql.jdbc.AbandonedConnectionCleanupThread;
 /**
  * This class is here to prevent a memory leak, because tomcat can't stop them jdbc-thread(mysqlconnection).
  */
-@WebListener // register it as you wish
+@WebListener
 public class ContainerContextClosedHandler implements ServletContextListener {
     //private static final Logger logger = Logger.getLogger(ContainerContextClosedHandler.class.getName());
 
@@ -26,6 +26,7 @@ public class ContainerContextClosedHandler implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         // nothing to do
+    	System.out.println("Initialize Container Context");
     }
 
     /**
@@ -33,6 +34,7 @@ public class ContainerContextClosedHandler implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    	System.out.println("Destroy Container Context");
         Enumeration<Driver> drivers = DriverManager.getDrivers();     
 
         Driver driver = null;
