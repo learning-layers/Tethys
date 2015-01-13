@@ -18,6 +18,10 @@
             <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
             <param-value>true</param-value>
         </init-param>
+        <init-param>
+      		<param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
+      		<param-value>true</param-value>
+  		</init-param>  
         <load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -35,12 +39,12 @@
   </init-param>
   <init-param>
     <param-name>swagger.api.basepath</param-name>
-    <param-value>http://137.226.58.11:8081/@Tethys@</param-value>
+    <param-value>http://@Hostname@:@Port@/@DeployName@</param-value>
   </init-param>
   <init-param>
       <param-name>swagger.filter</param-name>
       <param-value>de.dbis.acis.cloud.Tethys.util.InternalSwaggerFilter</param-value>
-    </init-param>
+  </init-param>
   <load-on-startup>1</load-on-startup>
 </servlet>
 

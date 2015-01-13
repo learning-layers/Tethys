@@ -91,13 +91,19 @@ uploadArchives {
     }
 }
 
-war{
-	eachFile{
-		if (it.name == 'web.xml'){
-			it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': 'Tethys'])
-		}
-	}
-}
+//war{
+//	eachFile{
+//		if (it.name == 'web.xml'){
+//			it.filter(org.apache.tools.ant.filters.ReplaceTokens,
+//				tokens: [
+//					'Hostname':		'localhost',
+//					'Port':			'8080',
+//					'DeployName':	'TethysLDAPConnector'
+//				]
+//			)
+//		}
+//	}
+//}
 
 //------------
 //Classes For cargo tasks
@@ -182,7 +188,13 @@ remoteTypes.each { type ->
 				war{
 					eachFile{
 						if (it.name == 'web.xml'){
-							it.filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: ['Tethys': config.context])
+							it.filter(org.apache.tools.ant.filters.ReplaceTokens,
+								tokens: [
+									'Hostname' : config.remoteEnvironment.hostname,
+									'Port' : config.remoteEnvironment.port as String,
+									'DeployName' : config.context
+								]
+							)
 						}
 					}
 				}
