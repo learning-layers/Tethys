@@ -1,5 +1,7 @@
 package de.dbis.acis.cloud.Tethys;
 
+import java.util.ResourceBundle;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -11,39 +13,21 @@ import com.wordnik.swagger.jaxrs.config.DefaultJaxrsScanner;
 import com.wordnik.swagger.jaxrs.reader.DefaultJaxrsApiReader;
 import com.wordnik.swagger.reader.ClassReaders;
 
-//@WebServlet(name = "SwaggerJaxrsServlet", loadOnStartup = 0)
-//public class SwaggerJaxrsServlet extends HttpServlet {
 @WebListener
 public class SwaggerJaxrsListener implements ServletContextListener {
 
-//	/**
-//	 * 
-//	 */
-//	private static final long serialVersionUID = 1L;
-//
-//	@Override
-//	public void init() {
-//		System.out.println("Swagger starts...");
-//		try{
-////			SwaggerConfig swaggerConfig = new SwaggerConfig();
-////			ConfigFactory.setConfig(swaggerConfig);
-////			swaggerConfig.setBasePath("http://localhost:8081/Chocoloper2Tethys");
-////			swaggerConfig.setApiVersion("1.0.0");
-////			ScannerFactory.setScanner(new DefaultJaxrsScanner());
-////			ClassReaders.setReader(new DefaultJaxrsApiReader());
-//		} catch(Exception e) {
-//			System.out.println("Fehler im Swag");
-//		}
-//		System.out.println("Swagger started!");
-//		System.out.println("");
-//	}
+	ResourceBundle resourceBundle = ResourceBundle.getBundle("swagger");
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		System.out.println("Swagger starts...");
 		SwaggerConfig swaggerConfig = new SwaggerConfig();
 		ConfigFactory.setConfig(swaggerConfig);
-		swaggerConfig.setBasePath("http://localhost:8081/Chocoloper2Tethys");
+		swaggerConfig.setBasePath(
+				"http://"+resourceBundle.getString("swaggerWebApplicationHost")
+				+":"		+resourceBundle.getString("swaggerWebApplicationPort")
+				+"/"		+resourceBundle.getString("swaggerWebApplicationName")
+		);
 		swaggerConfig.setApiVersion("1.0.0");
 		ScannerFactory.setScanner(new DefaultJaxrsScanner());
 		ClassReaders.setReader(new DefaultJaxrsApiReader());
