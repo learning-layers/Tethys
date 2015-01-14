@@ -20,7 +20,7 @@ public class TethysBinder extends AbstractBinder {
 		//Binding via Factory. In this Case too much overhead.
 		//bindFactory(new ProxyFactory<ProxyKeystoneVersions>(ProxyKeystoneVersions.class)).to(ProxyKeystoneVersions.class);
 		//Binding by Hand. Faster than binding by Factory.
-		bind(WebResourceFactory.newResource(ProxyKeystoneVersions.class, ClientBuilder.newClient().target("http://137.226.58.2:5000"))).to(ProxyKeystoneVersions.class);
+		//bind(WebResourceFactory.newResource(ProxyKeystoneVersions.class, ClientBuilder.newClient().target("http://137.226.58.2:5000"))).to(ProxyKeystoneVersions.class);
 	}
 
 }

@@ -106,7 +106,7 @@ public class UsersResource {
 		Response r = null;
 		if(pw != null && pw.equals("useanotherpw")){
 		JsonObject key = OpenstackClient.adminAuth(UserStorageResource.getSwiftCredentials());
-		Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), "user_"+sub);
+		Status answer = OpenstackClient.createContainer(key.get("X-Auth-Token").getAsString(), key.get("tenant-id").getAsString(), uid);
 			r = Response.status(answer).build();
 		}
 		return r;
