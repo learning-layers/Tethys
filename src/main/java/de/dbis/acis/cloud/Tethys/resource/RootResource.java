@@ -27,7 +27,7 @@ public class RootResource {
 	public String getRoot() {
 		return "<html>"+
 				"<body>"+
-				"This is the i5Cloud API home. For information on how to access the APIs, please visit <a href='http://developer.learning-layers.eu/documentation/tethys/'>the Learning Layers developers website.</a>"+
+				"This is the Tethys API home. For information on how to access the APIs, please visit <a href='http://developer.learning-layers.eu/documentation/tethys/'>the Learning Layers developers website.</a>"+
 				"</body>"+
 				"</html>";
 	}

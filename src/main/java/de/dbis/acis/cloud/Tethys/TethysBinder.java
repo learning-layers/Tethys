@@ -5,7 +5,8 @@ import javax.ws.rs.client.ClientBuilder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.client.proxy.WebResourceFactory;
 
-import de.dbis.acis.cloud.Tethys.proxy.openstack.keystone.v2_0.ProxyKeystoneVersions;
+import de.dbis.acis.cloud.Tethys.proxy.openstack.keystone.v2_0.ProxyKeystoneApi;
+import de.dbis.acis.cloud.Tethys.util.GsonMessageBodyHandler;
 
 /**
  * HK2 Binding class. Which binds classes for Dependency Injection(DI).
@@ -18,9 +19,9 @@ public class TethysBinder extends AbstractBinder {
 	@Override
 	protected void configure() {
 		//Binding via Factory. In this Case too much overhead.
-		//bindFactory(new ProxyFactory<ProxyKeystoneVersions>(ProxyKeystoneVersions.class)).to(ProxyKeystoneVersions.class);
+		//bindFactory(new ProxyFactory<ProxyKeystoneApi>(ProxyKeystoneApi.class)).to(ProxyKeystoneApi.class);
 		//Binding by Hand. Faster than binding by Factory.
-		//bind(WebResourceFactory.newResource(ProxyKeystoneVersions.class, ClientBuilder.newClient().target("http://137.226.58.2:5000"))).to(ProxyKeystoneVersions.class);
+		bind(WebResourceFactory.newResource(ProxyKeystoneApi.class, ClientBuilder.newClient().target("http://137.226.58.2:5000").register(GsonMessageBodyHandler.class))).to(ProxyKeystoneApi.class);
 	}
 
 }
