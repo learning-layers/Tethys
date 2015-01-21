@@ -41,32 +41,33 @@ List swagger = [
 //	'com.wordnik:swagger-annotations:1.3.12',							//Annotations for eclipse. Uncomment it for testing purposes without Swagger 
 	'com.wordnik:swagger-jersey2-jaxrs_2.11:1.3.12',					//Provides Swagger for Jersey 2.0
 ]
-
 List javax = [
 	'javax.servlet:javax.servlet-api:3.0.1',							//only for eclipse as tomcat7 already uses servlet-api 3.0
 	'org.eclipse.persistence:javax.persistence:2.1.0'
 ]
-
 List jersey = [
-	'org.glassfish.jersey.ext:jersey-proxy-client:2.13',
 	'org.glassfish.jersey.containers:jersey-container-servlet:2.13',
+	'org.glassfish.jersey.containers:jersey-container-servlet-core:2.13',
+	'org.glassfish.jersey.ext:jersey-proxy-client:2.13'
 ]
 List hibernate = [
 	'org.hibernate:hibernate-core:4.1.1.Final',
 	'org.hibernate:hibernate-entitymanager:4.1.1.Final',
 	'org.hibernate:hibernate-validator:4.2.0.Final',
 ]
-
-List apache = []//'org.apache.tomcat:tomcat-servlet-api:7.0.37']
-List google = ['com.google.code.gson:gson:2.2.4']
-List mysql = ['mysql:mysql-connector-java:5.1.34']
+List google = [
+	'com.google.code.gson:gson:2.2.4'
+]
+List mysql = [
+	'mysql:mysql-connector-java:5.1.34'
+]
 
 //------------
 //new configuration for custom cargo tasks
 //------------
 configurations {
 	remoteRuntime{
-//		transitive = false
+		transitive = false
 	}
 }
 
@@ -79,7 +80,7 @@ dependencies {
 	compile javax, jersey, apache, google, mysql, swagger, hibernate
 	
 	//swagger is a servlet itself so it need to be deployed within the war and cannot be in the lib of the webserver
-	//jersey-container-servlet needs to be shipped! it's atm not on the server
+	//minimal set of jersey needs to be shipped! it's atm not on the server
 	remoteRuntime swagger, jersey
 }
 
@@ -138,6 +139,13 @@ def remoteEnvironments = [
 		port:			cargo_port as Integer,
 		username:		cargo_username,
 		password:		cargo_password
+	),
+	'TestServer': new RemoteEnvironment(
+		containerId:	cargo_containerId,
+		hostname:		cargo_testhostname, 
+		port:			cargo_port as Integer,
+		username:		cargo_username,
+		password:		cargo_password
 	)
 ]
 
@@ -156,7 +164,7 @@ def containers = [
 	new Container(
 		name:				cargo_testName,
 		context:			cargo_testName+cargo_deployName,
-		remoteEnvironment:	remoteEnvironments.get('TethysServer')
+		remoteEnvironment:	remoteEnvironments.get('TestServer')
 	)
 ]		
 

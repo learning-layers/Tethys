@@ -20,10 +20,16 @@ public class TethysApplication extends ResourceConfig {
 		register(de.dbis.acis.cloud.Tethys.util.CORSFilter.class);
 		register(de.dbis.acis.cloud.Tethys.util.ContainerContextClosedHandler.class);
 		packages("com.wordnik.swagger.jaxrs.json");
-		register(com.wordnik.swagger.jaxrs.listing.ApiListingResource.class);
-		register(com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider.class);
-		register(com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON.class);
-		register(com.wordnik.swagger.jaxrs.listing.ResourceListingProvider.class);
+	
+		register(com.wordnik.swagger.jersey.listing.ApiListingResource.class);
+		register(com.wordnik.swagger.jersey.listing.JerseyApiDeclarationProvider.class);
+		register(com.wordnik.swagger.jersey.listing.ApiListingResourceJSON.class);
+		register(com.wordnik.swagger.jersey.listing.JerseyResourceListingProvider.class);
+		
+//		register(com.wordnik.swagger.jaxrs.listing.ApiListingResource.class);
+//		register(com.wordnik.swagger.jaxrs.listing.ApiDeclarationProvider.class);
+//		register(com.wordnik.swagger.jaxrs.listing.ApiListingResourceJSON.class);
+//		register(com.wordnik.swagger.jaxrs.listing.ResourceListingProvider.class);
 //		register(new LoggingFilter());
 //		property(ServerProperties.TRACING, "ALL");
 		System.out.println("Tethys started!");

@@ -43,11 +43,20 @@ public interface ProxyKeystoneApi {
 	
 	// Extensions
 
+	/**
+	 * Extensions : List extensions
+	 * @return
+	 */
 	@Path("v2.0/extensions")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject listExtensions();
 	
+	/**
+	 * Extensions : Get extension details
+	 * @param extensionAlias
+	 * @return
+	 */
 	@Path("v2.0/extensions/{alias}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -55,12 +64,22 @@ public interface ProxyKeystoneApi {
 	
 	// Tokens
 	
+	/**
+	 * Tokens : Authenticate
+	 * @param userdata
+	 * @return
+	 */
 	@Path("v2.0/tokens")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JsonObject authenticate(JsonObject userdata);
 	
+	/**
+	 * Tokens : List tenants
+	 * @param xAuthToken
+	 * @return
+	 */
 	@Path("v2.0/tenants")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
